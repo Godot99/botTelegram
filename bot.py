@@ -1,9 +1,9 @@
 import logging
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
-import os
 
 # Authentication to manage the bot
+import os
 TOKEN = os.getenv('TOKEN')
 
 # Show logs in terminal
@@ -16,6 +16,10 @@ logging.basicConfig(
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Son un bot, dime algo!")
 
+# This function responds to echo handler
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+
 if __name__ == '__main__':
     # Start the application to operate the bot
     application = ApplicationBuilder().token(TOKEN).build()
@@ -23,6 +27,10 @@ if __name__ == '__main__':
     # Handler to manage the start command
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
-    
+
+    # Handler to manage text messages
+    echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo)
+    application.add_handler(echo_handler)
+
     # Keeps the application running
     application.run_polling()
